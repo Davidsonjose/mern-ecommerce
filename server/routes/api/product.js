@@ -20,6 +20,17 @@ const { ROLES } = require('../../constants');
 const storage = multer.memoryStorage();
 const upload = multer({ storage });
 
+
+// install cloudinary
+const cloudinary = require("cloudinary").v2;
+const fs = require("fs");
+
+cloudinary.config({
+  cloud_name: "dhblwdgrp",
+  api_key: "784283117324788",
+  api_secret: "nYdA9i1PyZ2lTDuZqDvDsbMmInE",
+});
+
 // fetch product slug api
 router.get('/item/:slug', async (req, res) => {
   try {
@@ -269,7 +280,7 @@ router.post(
       const taxable = req.body.taxable;
       const isActive = req.body.isActive;
       const brand = req.body.brand;
-      // const image = req.file;
+      const image = req.file;
 
       if (!sku) {
         return res.status(400).json({ error: 'You must enter sku.' });
@@ -294,7 +305,8 @@ router.post(
       }
 
       // const { imageUrl, imageKey } = await s3Upload(image);
-
+      image.mv("uploads/" + image.name);
+      let cloudFile = await cloudinary.uploader.upload("uploads/" + image.name);
       const product = new Product({
         sku,
         name,
@@ -304,8 +316,8 @@ router.post(
         taxable,
         isActive,
         brand
-        // imageUrl,
-        // imageKey
+        imageUrl: cloudFile.url,
+        imageKey: cloudFile.url
       });
 
       const savedProduct = await product.save();

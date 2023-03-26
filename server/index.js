@@ -28,7 +28,7 @@ app.use(express.static(path.resolve(__dirname, '../dist')));
 setupDB();
 require('./config/passport')(app);
 app.use(routes);
-
+app.use("/uploads", express.static(path.join(__dirname, "uploads")));
 console.log('process.env.NODE_ENV ', process.env.NODE_ENV);
 if (process.env.NODE_ENV === 'production') {
   app.use(compression());
